@@ -14,7 +14,7 @@ RUN apt-get update && \
     mix archive.install hex phx_new 1.5.3 --force && \
     mix local.rebar --force
 
-RUN ls && mix deps.get && mix local.hex --force
+RUN mix deps.get && mix local.hex --force
 
 
 
