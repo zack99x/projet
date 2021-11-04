@@ -21,4 +21,4 @@ RUN mix deps.get && mix local.hex --force
 #  COPY assets/css
 # COPY assets/package-lock.json assets
 
-CMD cd ptm_api && mix deps.get && mix local.hex --force && cd assets && npm install && cd .. && mix ecto.setup && mix phx.server
+CMD mix deps.get && mix local.hex --force && cd assets && npm install && cd .. && mix ecto.setup && mix phx.server
