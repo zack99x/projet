@@ -1,14 +1,23 @@
-language: elixir
-elixir:
-  - 1.3.4
-otp_release:
-  - 19.1
+arch:
+  - arm64
+
+env:
+  - IMGNAME=bradmorg/ubuntu:dbot
+
+services:
+  - docker
+
+before_install:
+- docker image build -t ${IMGNAME} .
 
 script:
-  - MIX_ENV=test mix do compile --warnings-as-errors, coveralls.json
+#TravisCI seems to be coming in on undocumented IP addresses.
+ - dig +short myip.opendns.com @resolver1.opendns.com
+
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
-notifications:
-  email: false
+- docker login -u ${DHUB_USERNAME} -p ${DHUB_PASS}
+- echo "${SSH_KEY}" |  base64 --decode > /tmp/ssh_rsa
+- chmod 600 /tmp/ssh_rsa
+- ssh -o "StrictHostKeyChecking no" pi@${IPADDR} -i /tmp/ssh_rsa "echo test > test.log"
+- ssh -o "StrictHostKeyChecking no" pi@${IPADDR} -i /tmp/ssh_rsa "cd ${INSTALL_LOCATION} && git pull ${TRAVIS_BUILD_WEB_URL} && docker image build -t ${IMGNAME} ${INSTALL_LOCATION}/. && docker push ${IMGNAME} && docker stop discordbot; docker rm discordbot; docker run --name discordbot --restart always -d -e TOKEN=${TOKEN} ${IMGNAME}"
